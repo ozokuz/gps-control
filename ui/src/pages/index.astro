@@ -1,0 +1,16 @@
+---
+import Layout from '../layouts/Layout.astro';
+import StatusIndicator from '../components/StatusIndicator';
+---
+
+<Layout title="Welcome to GPS UI.">
+	<main class="mx-auto w-1/2 flex flex-col items-center gap-4 mt-16">
+		<h1 class="font-semibold text-2xl">Welcome to GPS UI</h1>
+		<p class="">
+			To get started, open the directory <code>src/pages</code> in your project.<br />
+			<strong>Code Challenge:</strong> Tweak the "Welcome to Astro" message above.
+		</p>
+		<a href="/app" class="bg-green-600 px-4 py-2 rounded text-white">Go to App</a>
+		<StatusIndicator client:load />
+	</main>
+</Layout>
