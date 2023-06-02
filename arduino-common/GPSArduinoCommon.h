@@ -7,13 +7,7 @@
 #define BUF_SIZE 32
 #define WAYPOINT_MAX_COUNT 100
 
-enum class Command : uint8_t {
-  Sync,
-  ManualMode,
-  PilotMode,
-  Home,
-  Move
-};
+enum class Command : uint8_t { Sync, ManualMode, PilotMode, Home, Move };
 
 struct Status {
   float speed;
@@ -26,13 +20,25 @@ struct Status {
   uint8_t motorTemperature;
 };
 
+struct WaypointWithIndex {
+  uint8_t index;
+  float latitude, longitude;
+};
+
 struct Waypoint {
   float latitude, longitude;
 
-  Waypoint(float latitude, float longitude) : latitude(latitude), longitude(longitude) {}
+  Waypoint(const WaypointWithIndex& waypoint)
+      : latitude(waypoint.latitude), longitude(waypoint.longitude) {}
 };
 
-struct WaypointIndex {
-  uint8_t size;
-  float latitude, longitude;
+struct Joystick {
+  uint8_t joyX = 127, joyY = 127;
+
+  Joystick() {}
+
+  Joystick(uint8_t x, uint8_t y) : joyX(x), joyY(y) {}
+
+  Joystick(const Joystick& joystick)
+      : joyX(joystick.joyX), joyY(joystick.joyY) {}
 };

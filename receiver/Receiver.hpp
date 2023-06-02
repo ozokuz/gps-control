@@ -23,8 +23,7 @@ class Receiver {
   Waypoint* waypoints;
   bool pilotMode = false;
   bool navigateHome = false;
-  uint8_t joyX = 127;
-  uint8_t joyY = 127;
+  Joystick joystick;
   uint8_t lastWaypoint = -1;
   uint8_t nextWaypoint = -1;
 };

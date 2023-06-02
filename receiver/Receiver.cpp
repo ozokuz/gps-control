@@ -58,13 +58,13 @@ void Receiver::Receive() {
   radio.read(recvBuffer, BUF_SIZE);
 
   Command cmd = static_cast<Command>(recvBuffer[0]);
+  void* otherData = (void*)recvBuffer[1];
 
   switch (cmd) {
     case Command::Sync:
-      uint8_t index = recvBuffer[1];
-      float latitude = recvBuffer[2];
-      float longitude = recvBuffer[6];
-      waypoints[index] = Waypoint(latitude, longitude);
+      WaypointWithIndex waypoint = *(WaypointWithIndex*)otherData;
+
+      waypoints[waypoint.index] = Waypoint(waypoint);
       break;
     case Command::ManualMode:
       pilotMode = false;
@@ -76,8 +76,7 @@ void Receiver::Receive() {
       navigateHome = true;
       break;
     case Command::Move:
-      joyX = recvBuffer[1];
-      joyY = recvBuffer[2];
+      joystick = Joystick(*(Joystick*)otherData);
       break;
   }
 }
