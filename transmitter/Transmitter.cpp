@@ -118,7 +118,7 @@ void Transmitter::ReceiveStatus() {
   radio.read(&boatStatus, sizeof(Status));
 
   fullStatus.speed = boatStatus.speed;
-  fullStatus.rotation = boatStatus.rotation;
+  fullStatus.heading = boatStatus.heading;
   fullStatus.latitude = boatStatus.latitude;
   fullStatus.longitude = boatStatus.longitude;
   fullStatus.battery = boatStatus.battery;
@@ -141,15 +141,15 @@ uint8_t Transmitter::ConnectionQuality() {
 }
 
 void FullStatus::to_msgpack(MsgPack::Packer& packer) const {
-  packer.to_map(key_speed, speed, key_rotation, rotation, key_latitude,
-                latitude, key_longitude, longitude, key_battery, battery,
+  packer.to_map(key_speed, speed, key_heading, heading, key_latitude, latitude,
+                key_longitude, longitude, key_battery, battery,
                 key_timeRemaining, timeRemaining, key_motorPower, motorPower,
                 key_motorTemperature, motorTemperature, key_connectionQuality,
                 connectionQuality);
 }
 
 void FullStatus::from_msgpack(MsgPack::Unpacker& unpacker) {
-  unpacker.from_map(key_speed, speed, key_rotation, rotation, key_latitude,
+  unpacker.from_map(key_speed, speed, key_heading, heading, key_latitude,
                     latitude, key_longitude, longitude, key_battery, battery,
                     key_timeRemaining, timeRemaining, key_motorPower,
                     motorPower, key_motorTemperature, motorTemperature,

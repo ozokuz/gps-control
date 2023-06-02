@@ -17,7 +17,7 @@ enum class Command : uint8_t {
 
 struct Status {
   float speed;
-  uint8_t rotation;
+  uint8_t heading;
   float latitude;
   float longitude;
   uint8_t battery;

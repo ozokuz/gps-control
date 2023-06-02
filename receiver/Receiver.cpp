@@ -84,7 +84,7 @@ void Receiver::Receive() {
 
 void Receiver::UpdateStatus() {
   boatStatus.speed = 0;
-  boatStatus.rotation = 0;
+  boatStatus.heading = 0;
   boatStatus.latitude = 60;
   boatStatus.longitude = 60;
   boatStatus.battery = 100;

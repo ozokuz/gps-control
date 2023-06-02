@@ -9,8 +9,8 @@
 struct FullStatus {
   MsgPack::str_t key_speed{"speed"};
   float speed;
-  MsgPack::str_t key_rotation{"rotation"};
-  uint8_t rotation;
+  MsgPack::str_t key_heading{"heading"};
+  uint8_t heading;
   MsgPack::str_t key_latitude{"latitude"};
   float latitude;
   MsgPack::str_t key_longitude{"longitude"};
