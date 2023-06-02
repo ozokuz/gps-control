@@ -1,10 +1,6 @@
 #pragma once
-#include <SPI.h>
-#include <nRF24L01.h>
-#include <RF24.h>
+#include "Radio.hpp"
 
-#define CHANNEL 0x5F
-#define BUF_SIZE 32
 #define WAYPOINT_MAX_COUNT 100
 
 enum class Command : uint8_t { Sync, ManualMode, PilotMode, Home, Move };

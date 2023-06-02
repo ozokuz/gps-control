@@ -1,49 +1,33 @@
 #include "Receiver.hpp"
 
-const uint8_t addresses[][6] = {"1Node", "2Node"};
 const int connectionLed = 2;
 
-Receiver::Receiver() : radio(RF24(9, 10)) {}
+Receiver::Receiver() {}
 
 void Receiver::Setup() {
   recvBuffer = (uint8_t*)malloc(BUF_SIZE);
   waypoints = (Waypoint*)malloc(WAYPOINT_MAX_COUNT);
 
   Serial.begin(9600);
-  if (!radio.begin()) {
-    Serial.println(F("* Error: radio.begin failed *"));
-    while (true) {}
-  }
 
-  // set settings
-  radio.setDataRate(RF24_2MBPS);
-  radio.setPALevel(RF24_PA_MAX);
-  radio.setRetries(0, 15);
-  radio.setChannel(CHANNEL);
-  radio.enableDynamicPayloads();
-  radio.setAutoAck(true);
-
-  // complete initialization
-  radio.openWritingPipe(addresses[1]);
-  radio.openReadingPipe(1, addresses[0]);
-  radio.powerUp();
-  radio.startListening();
+  radio.Init(false);
 
   UpdateStatus();
 }
 
 void Receiver::Loop() {
-  if (!radio.available()) {
+  if (!radio.HasData()) {
     Serial.println(F("No connection"));
     // Warning for no connection (Worse connection => faster blinking)
     digitalWrite(connectionLed, HIGH);
-    return;
   }
 
   // Main code
   Send();
 
-  Receive();
+  if (radio.HasData()) {
+    Receive();
+  }
 
   Logic();
 
@@ -55,7 +39,7 @@ void Receiver::Loop() {
 void Receiver::Logic() {}
 
 void Receiver::Receive() {
-  radio.read(recvBuffer, BUF_SIZE);
+  radio.Read(recvBuffer, BUF_SIZE);
 
   Command cmd = static_cast<Command>(recvBuffer[0]);
   void* otherData = (void*)recvBuffer[1];
@@ -93,11 +77,7 @@ void Receiver::UpdateStatus() {
 }
 
 void Receiver::Send() {
-  radio.stopListening();
-
-  if (!radio.write(&boatStatus, sizeof(Status))) {
+  if (!radio.Write(&boatStatus, sizeof(Status))) {
     Serial.println(F("Couldn't send status"));
   }
-
-  radio.startListening();
 }

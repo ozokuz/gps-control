@@ -56,8 +56,7 @@ class Transmitter {
   uint8_t ConnectionQuality();
 
  private:
-  RF24 radio;
-
+  Radio radio;
   uint8_t* sendBuffer = nullptr;
   int8_t connectionStatusIndex = -1;
   bool connectionStatuses[CONNECTION_STATUS_SIZE];

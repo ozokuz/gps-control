@@ -17,7 +17,7 @@ class Receiver {
   void Send();
 
  private:
-  RF24 radio;
+  Radio radio;
   uint8_t* recvBuffer = nullptr;
   Status boatStatus;
   Waypoint* waypoints;

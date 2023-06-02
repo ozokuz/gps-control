@@ -1,33 +1,16 @@
 #include "Transmitter.hpp"
 
-const byte addresses[][6] = {"1Node", "2Node"};
 const int connectionLed = 2;
 
-Transmitter::Transmitter() : radio(RF24(9, 10)) {}
+Transmitter::Transmitter() {}
 
 void Transmitter::Setup() {
   sendBuffer = (uint8_t*)malloc(BUF_SIZE);
   waypoints = (Waypoint*)malloc(WAYPOINT_MAX_COUNT);
 
   Serial.begin(9600);
-  if (!radio.begin()) {
-    Serial.println(F("* Error: radio.begin failed *"));
-    while (true) {}
-  }
-
-  // set settings
-  radio.setDataRate(RF24_2MBPS);
-  radio.setPALevel(RF24_PA_MAX);
-  radio.setRetries(0, 15);
-  radio.setChannel(CHANNEL);
-  radio.enableDynamicPayloads();
-  radio.setAutoAck(true);
-
-  // complete initialization
-  radio.openWritingPipe(addresses[0]);
-  radio.openReadingPipe(1, addresses[1]);
-  radio.powerUp();
-  radio.startListening();
+  
+  radio.Init(true);
 }
 
 void Transmitter::Loop() {
@@ -36,7 +19,7 @@ void Transmitter::Loop() {
     connectionStatusIndex = 0;
   }
 
-  if (!radio.available()) {
+  if (!radio.HasData()) {
     Serial.println(F("No connection"));
     // Warning for no connection (Worse connection => faster blinking)
     digitalWrite(connectionLed, HIGH);
@@ -87,8 +70,6 @@ void Transmitter::SaveWaypoints() {
 }
 
 void Transmitter::SendCommand(Command command) {
-  radio.stopListening();
-
   sendBuffer[0] = apiCommand.command;
 
   switch (command) {
@@ -109,13 +90,11 @@ void Transmitter::SendCommand(Command command) {
       break;
   }
 
-  radio.write(sendBuffer, BUF_SIZE);
-
-  radio.startListening();
+  radio.Write(sendBuffer, BUF_SIZE);
 }
 
 void Transmitter::ReceiveStatus() {
-  radio.read(&boatStatus, sizeof(Status));
+  radio.Read(&boatStatus, sizeof(Status));
 
   fullStatus.speed = boatStatus.speed;
   fullStatus.heading = boatStatus.heading;
