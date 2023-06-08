@@ -1,8 +1,10 @@
 #include <EEPROM.h>
 #include <QMC5883LCompass.h>
 #include <math.h>
+#include <Servo.h>
 
 QMC5883LCompass compass;
+Servo rudderServo;
 
 float myLat0 = 60.133470206254394, myLon0 = 24.942398071289066;  //previous location
 float myLat1 = 60.138256970188564, myLon1 = 24.946861267089847;  //location now
@@ -18,9 +20,14 @@ float WaypointLong[] = { -1.0, 24.9580192565918, 24.97346878051758, 24.973468780
 
 int WaypointIndex = 1;
 int WayPointCount = sizeof(WaypointLat) / sizeof(WaypointLat[0]);
+int rudderAngle;
+int rudderTrim = 10;
+int maxRudderAngle = 60;
+
 void setup() {
   Serial.begin(9600);
   compass.setCalibration(-2800, 15, -3570, 0, -6892, 0);
+  rudderServo.attach(5);
 }
 
 void loop() {
@@ -44,20 +51,46 @@ void loop() {
   Serial.print(" headingChange ");
   Serial.print(headingChange);
   Serial.print(" distanceToNextWaypoint ");
-  Serial.println(distanceToNextWaypoint);
+  Serial.print(distanceToNextWaypoint);
 
-  WaypointIndex = WaypointIndex + 1;
-  if (WaypointIndex >= WayPointCount) {
-    Serial.println(" ");
-    WaypointIndex = 1;
-    delay(5000);
+  if (Serial.available()) {
+    String inputString = Serial.readStringUntil('\n');
+    WaypointIndex = inputString.toInt();
+    if (WaypointIndex > WayPointCount-1){
+      WaypointIndex = WayPointCount-1;
+    }
+    if (WaypointIndex < 1) {
+      WaypointIndex = 1;
+    }
   }
+
+  rudderAngle = rudderControl(headingChange, rudderTrim, maxRudderAngle);
+  Serial.print(" rudderAngle: ");
+  Serial.print(rudderAngle);
+  Serial.println("");
+}
+
+int rudderControl(int turnAngle, int trim, int maxTurn) {
+  const int SERVO_MID_POINT = 90;
+  int zeroPoint = SERVO_MID_POINT + trim;
+  int servoValue = zeroPoint + map(turnAngle, -180, 180, -maxTurn, maxTurn);
+  servoValue = constrain(servoValue, 0, 180);  // ensure servo value is between 0 and 180
+  int angleDifference = servoValue - zeroPoint;
+  if (abs(angleDifference) > maxTurn) {
+    angleDifference = (angleDifference > 0 ? maxTurn : -maxTurn);
+  }
+  Serial.print(" servoValue: "); Serial.print(servoValue);
+  rudderServo.write(servoValue);  // set the servo to the calculated position
+  return angleDifference;
 }
 
 void myCoordinates() {
   //reads coordinates from gps and saves them to myLat1 and myLong1
-  
+
+
+
   //manual input for testing purposes:
+  /*
   if (Serial.available()) {                                           // Check if data is available to read
     char incomingData[30];                                            // Array to store incoming serial data
     Serial.readBytesUntil('\n', incomingData, sizeof(incomingData));  // Read the incoming data until newline character
@@ -71,6 +104,7 @@ void myCoordinates() {
       myLon1 = atof(longitudeStr);
     }
   }
+  */
 }
 
 float currentGPSHeading(float lat1, float lon1, float lat2, float lon2) {
