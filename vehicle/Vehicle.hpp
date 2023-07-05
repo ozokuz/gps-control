@@ -3,9 +3,9 @@
 #include <Arduino.h>
 #include <GPSArduinoCommon.h>
 
-class Receiver {
+class Vehicle {
  public:
-  Receiver();
+  Vehicle();
 
   void Setup();
   void Loop();

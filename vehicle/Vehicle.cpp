@@ -1,10 +1,10 @@
-#include "Receiver.hpp"
+#include "Vehicle.hpp"
 
 const int connectionLed = 2;
 
-Receiver::Receiver() {}
+Vehicle::Vehicle() {}
 
-void Receiver::Setup() {
+void Vehicle::Setup() {
   recvBuffer = (uint8_t*)malloc(BUF_SIZE);
   waypoints = (Waypoint*)malloc(WAYPOINT_MAX_COUNT);
 
@@ -15,7 +15,7 @@ void Receiver::Setup() {
   UpdateStatus();
 }
 
-void Receiver::Loop() {
+void Vehicle::Loop() {
   if (!radio.HasData()) {
     Serial.println(F("No connection"));
     // Warning for no connection (Worse connection => faster blinking)
@@ -36,9 +36,9 @@ void Receiver::Loop() {
   digitalWrite(connectionLed, LOW);
 }
 
-void Receiver::Logic() {}
+void Vehicle::Logic() {}
 
-void Receiver::Receive() {
+void Vehicle::Receive() {
   radio.Read(recvBuffer, BUF_SIZE);
 
   Command cmd = static_cast<Command>(recvBuffer[0]);
@@ -65,7 +65,7 @@ void Receiver::Receive() {
   }
 }
 
-void Receiver::UpdateStatus() {
+void Vehicle::UpdateStatus() {
   boatStatus.speed = 0;
   boatStatus.heading = 0;
   boatStatus.latitude = 60;
@@ -76,7 +76,7 @@ void Receiver::UpdateStatus() {
   boatStatus.motorTemperature = 18;
 }
 
-void Receiver::Send() {
+void Vehicle::Send() {
   if (!radio.Write(&boatStatus, sizeof(Status))) {
     Serial.println(F("Couldn't send status"));
   }
