@@ -1,19 +1,19 @@
-#include "Transmitter.hpp"
+#include "Remote.hpp"
 
 const int connectionLed = 2;
 
-Transmitter::Transmitter() {}
+Remote::Remote() {}
 
-void Transmitter::Setup() {
+void Remote::Setup() {
   sendBuffer = (uint8_t*)malloc(BUF_SIZE);
   waypoints = (Waypoint*)malloc(WAYPOINT_MAX_COUNT);
 
   Serial.begin(9600);
-  
+
   radio.Init(true);
 }
 
-void Transmitter::Loop() {
+void Remote::Loop() {
   connectionStatusIndex++;
   if (connectionStatusIndex >= CONNECTION_STATUS_SIZE) {
     connectionStatusIndex = 0;
@@ -47,9 +47,9 @@ void Transmitter::Loop() {
   connectionStatuses[connectionStatusIndex] = true;
 }
 
-void Transmitter::Sync() {}
+void Remote::Sync() {}
 
-void Transmitter::ReceiveCommand() {
+void Remote::ReceiveCommand() {
   int size = Serial.available();
 
   if (size == 0) {
@@ -65,11 +65,11 @@ void Transmitter::ReceiveCommand() {
   free(buffer);
 }
 
-void Transmitter::SaveWaypoints() {
+void Remote::SaveWaypoints() {
   // apiCommand.waypoints.
 }
 
-void Transmitter::SendCommand(Command command) {
+void Remote::SendCommand(Command command) {
   sendBuffer[0] = apiCommand.command;
 
   switch (command) {
@@ -93,7 +93,7 @@ void Transmitter::SendCommand(Command command) {
   radio.Write(sendBuffer, BUF_SIZE);
 }
 
-void Transmitter::ReceiveStatus() {
+void Remote::ReceiveStatus() {
   radio.Read(&boatStatus, sizeof(Status));
 
   fullStatus.speed = boatStatus.speed;
@@ -110,7 +110,7 @@ void Transmitter::ReceiveStatus() {
   Serial.write(packer.data(), packer.size());
 }
 
-uint8_t Transmitter::ConnectionQuality() {
+uint8_t Remote::ConnectionQuality() {
   uint8_t total = 0;
   for (size_t i = 0; i < CONNECTION_STATUS_SIZE; i++) {
     total += connectionStatuses[i];

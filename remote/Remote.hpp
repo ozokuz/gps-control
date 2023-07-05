@@ -40,9 +40,9 @@ struct ApiCommand {
   void from_msgpack(MsgPack::Unpacker& unpacker);
 };
 
-class Transmitter {
+class Remote {
  public:
-  Transmitter();
+  Remote();
 
   void Setup();
   void Loop();
